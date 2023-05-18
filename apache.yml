@@ -1,0 +1,19 @@
+---
+
+- name: install apache
+  hosts: all
+  become: true
+
+  tasks:
+    - name: ensure apache is installed
+      yum:
+        name: httpd
+        state: present
+
+    - name: ensure apache is started
+      service:
+        name: httpd
+        state: started
+        enabled: true
+
+        
