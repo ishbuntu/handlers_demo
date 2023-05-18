@@ -1,7 +1,7 @@
 ---
 
 - name: install apache
-  hosts: all
+  hosts: linux
   become: true
 
   tasks:
@@ -16,4 +16,4 @@
         state: started
         enabled: true
 
-        
+
