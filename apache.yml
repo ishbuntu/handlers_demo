@@ -1,45 +1,42 @@
 ---
 
 - name: install apache
-  hosts: linux
+  hosts: all
   become: true
+
+ # vars_files:
+ #   - apache_default.yml
+ #   - apache_RedHat.yml
 
   handlers:
     - name: restart apache
       service:
-        name: httpd
+        name: "{{ apache_package }}"
         state: restarted 
 
     - name: restart memcached
       service:
         name: memcached
         state: restarted
+  
+  pre_tasks:
+    - name: load var files 
+      include_vars: "{{ item }}"
+      with_first_found:
+        - "apache_{{ ansible_os_family }}.yml"
+        - apache_default.yml
+
 
   tasks:
-
-    - name: add an ENV variable to remote user shell
-      lineinfile: 
-        dest: "~/.bash_profile"
-        regexp: '^ENV_VAR='
-        line: 'ENV_VAR=value' 
-      become: false
-
-    - name: print value of ENV vars to shell
-      shell: 'source ~/.bash_profile && echo $ENV_VAR'
-      register: foo
-
-    - debug:
-        msg: "The variable from shell is {{ foo.stdout }}"
-
     - name: ensure apache is installed
-      yum:
-        name: httpd
+      package:
+        name: "{{ apache_package }}"
         state: present
 
     - name: copy test config file
       copy:
         src: apachetest.conf
-        dest: /etc/httpd/conf.d/apachetest.conf
+        dest: "{{ apache_config_dir }}"
       notify: 
         - restart apache
         - restart memcached
@@ -49,7 +46,7 @@
 
     - name: ensure apache is started
       service:
-        name: httpd
+        name: "{{ apache_service }}"
         state: started
         enabled: true
 
