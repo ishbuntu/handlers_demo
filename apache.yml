@@ -16,6 +16,14 @@
         state: restarted
 
   tasks:
+
+    - name: add an ENV variable to remote user shell
+      lineinfile: 
+        dest: "~/.bash_profile"
+        regexp: '^ENV_VAR='
+        line: 'ENV_VAR=value' 
+      become: false
+
     - name: ensure apache is installed
       yum:
         name: httpd
