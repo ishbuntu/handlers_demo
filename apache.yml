@@ -24,6 +24,13 @@
         line: 'ENV_VAR=value' 
       become: false
 
+    - name: print value of ENV vars to shell
+      shell: 'source ~/.bash_profile && echo $ENV_VAR'
+      register: foo
+
+    - debug:
+        msg: "The variable from shell is {{ foo.stdout }}"
+
     - name: ensure apache is installed
       yum:
         name: httpd
